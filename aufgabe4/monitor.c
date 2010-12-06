@@ -15,7 +15,7 @@
  *
  */
 void monitor() {
-    for (;;) {
+    while (1) {
         /* Wir warten auf Nachrichten des CONV-Prozesses */
         while (queue_get_dir() != D_STAT_TO_MON)
             usleep(1);

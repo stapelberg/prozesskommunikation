@@ -22,7 +22,7 @@ void statistic() {
     uint8_t c, avg;
 
     cnt = 0;
-    for (;;) {
+    while (1) {
         /* Wir warten auf Nachrichten des CONV-Prozesses */
         while (queue_get_dir() != D_CONV_TO_STAT)
             usleep(1);

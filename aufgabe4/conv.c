@@ -19,7 +19,7 @@ void conv() {
     int number;
     struct msg *first;
     struct msg *second;
-    for (;;) {
+    while (1) {
         /* Zufallszahl generieren */
         number = rand();
 
