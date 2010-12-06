@@ -84,11 +84,11 @@ int main() {
 
     signal(SIGTERM, sigterm);
 
+    /* Warten, bis 4 Prozesse (Reihenfolge egal) sich beendet haben. */
     int status;
-    waitpid(pconv, &status, 0);
-    waitpid(plog, &status, 0);
-    waitpid(pstatistic, &status, 0);
-    waitpid(pmonitor, &status, 0);
+    int c;
+    for (c = 0; c < 4; c++)
+        wait(&status);
 
     return 0;
 }
