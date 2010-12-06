@@ -20,7 +20,6 @@
 
 static const int queue_size = sizeof(struct queueheader) + (sizeof(struct msg) * 255);
 
-static int fd;
 static uint8_t *shm;
 static struct queueheader *shmheader;
 static struct msg *shmdata;
@@ -55,6 +54,7 @@ static void unlock() {
  *
  */
 void queue_init() {
+    int fd;
     int flags = O_RDWR | O_CREAT | O_TRUNC;
     if ((fd = shm_open("/bts-sem", flags, S_IREAD | S_IWRITE)) == -1) {
         perror("shm_open");
@@ -69,10 +69,13 @@ void queue_init() {
         exit(EXIT_FAILURE);
     }
 
+    close(fd);
+
     shmheader = (struct queueheader*)shm;
     shmdata = (struct msg*)(shm + sizeof(struct queueheader));
 
-    shmheader->cur = 0;
+    /* Speicher mit 0 initialisieren */
+    memset(shmheader, 0, sizeof(struct queueheader));
     shmdata->dir = D_INVALID;
 
     /* Semaphor initialisieren */
