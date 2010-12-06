@@ -62,6 +62,7 @@ pid_t fork_child(funcptr work, funcptr cleanup) {
 
     /* parent process */
     printf("forked\n");
+    fflush(stdout);
     return pid;
 }
 
