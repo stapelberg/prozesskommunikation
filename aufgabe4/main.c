@@ -1,5 +1,7 @@
 /*
  * vim:ts=4:sw=4:expandtab
+ *
+ * © 2010 Michael Stapelberg
  * 
  */
 #include <stdio.h>
@@ -13,6 +15,7 @@
 #include "log.h"
 #include "monitor.h"
 #include "statistic.h"
+#include "queue.h"
 
 typedef void (*funcptr)();
 
@@ -69,6 +72,10 @@ pid_t fork_child(funcptr work, funcptr cleanup) {
  *
  */
 int main() {
+
+    /* Shared Memory-Bereich initialisieren */
+    queue_init();
+
     pconv = fork_child(conv, conv_cleanup);
     plog = fork_child(log, log_cleanup);
     pstatistic = fork_child(statistic, statistic_cleanup);
