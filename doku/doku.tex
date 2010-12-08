@@ -1,0 +1,122 @@
+\documentclass[12pt, a4paper]{scrartcl}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{palatino,avant}
+\usepackage{amsmath,amssymb,amsthm,mathabx,mathrsfs,stmaryrd}
+%\usepackage{txfonts}
+\usepackage{pb-diagram}
+\usepackage[pdftex,bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,colorlinks=true,filecolor=black,
+                linkcolor=red,urlcolor=blue,plainpages=false,pdfpagelabels,citecolor=black,
+                pdftitle={BTS-Dokumentation},pdfauthor={Michael Stapelberg}]{hyperref}
+\begin{document}
+\pagestyle{fancy}
+\chead{BTS}
+% New paragraph
+\newcommand{\np}{\bigskip\noindent}
+
+% No indention at new paragraphs
+\setlength{\parindent}{0pt}
+
+\section{Grundgerüst}
+
+Das Grundgerüst wird in Teilaufgabe 2, 3 und 4 verwendet und startet die
+verschiedenen Prozesse. Dies wird durch die Funktion \texttt{fork\_child()}
+erledigt, welche als Parameter zwei Zeiger auf Funktionen erwartet. Der erste
+Zeiger zeigt auf eine Funktion, welche die eigentlich Arbeit des Prozesses
+erledigt, der zweite Zeiger auf eine Aufräumfunktion. Das Definieren und
+Benutzen der \texttt{fork\_child}-Funktion erspart uns viel redundanten Code.
+\np
+
+Die Funktion ruft zunächst \texttt{fork} auf, um den Programmverlauf zu
+teilen. Im Kindprozess wird dann ein Signalhandler für das Signal
+\texttt{SIGINT} (Unterbrechung durch Ctrl-C) eingerichtet (hierfür wird der
+Aufräum-Funktionszeiger genutzt). Anschließend wird der erste Funktionszeiger
+aufgerufen. Dieser Aufruf kehrt nicht mehr zurück, da in allen Prozessen eine
+Endlosschleife enthalten ist.
+\np
+
+Im Elternprozess hingegen wird nach erfolgreichem Starten aller 4 Prozesse ein
+Signalhandler für \texttt{SIGTERM} (Beenden des Prozesses, z.B. durch
+\texttt{kill}) registriert, welcher seinerseits an die 4 Prozesse ein
+\texttt{SIGINT} sendet. Dadurch werden alle Kindprozesse auch beim Beenden des
+Elternprozesses korrekt beendet und geben ihre Resourcen frei.
+
+\subsection{Conv-Prozess}
+
+Der \texttt{Conv}-Prozess generiert mithilfe von \texttt{rand} eine
+ganzzahlige Zufallszahl. Dies entspricht dem Einlesen eines Werts von einem
+Analog-Digital-Wandler. Dieser Wert wird anschließend zum \texttt{Log}- und zum
+\texttt{Statistik}-Prozess gesendet.
+\np
+
+Der \texttt{Conv}-Prozess hat per se keinerlei dynamische Resourcen, die
+freigegeben werden müssten.
+
+\subsection{Log-Prozess}
+
+Der \texttt{Log}-Prozess öffnet zunächst die Datei \texttt{log.txt} zum
+Schreiben (er überschreibt sie, sofern sie bereits vorhanden ist) und empfängt
+dann Nachrichten. Die empfangenen Daten werden -- ein Datenwert pro Zeile --
+direkt in die Datei geschrieben. Es wird hierbei nicht via \texttt{fflush}
+sichergestellt, dass die Ausgabe tatsächlich auf die Festplatte geschrieben
+wurde. Stattdessen wird darauf vertraut, dass \texttt{fclose} beim Beenden des
+Programms aufgerufen wird, wobei alle Daten aus dem Puffer auf die Platte
+geschrieen werden.
+\np
+
+Der \texttt{Log}-Prozess gibt via \texttt{fclose} das Dateihandle frei, welches
+er beim Start geöffnet hat.
+
+\subsection{Statistik-Prozess}
+
+Der \texttt{Statistik}-Prozess empfängt je 5 Datenwerte und bildet anschließend
+das arithmetische Mittel über die empfangenen Werte. Das gebildete Mittel
+schickt er wiederum an den \texttt{Monitor}-Prozess.
+\np
+
+Da dieser Prozess ausschließlich mit statischen Puffern arbeitet hat er per se
+ebenfalls keine freizugebenden Resourcen bei Prozessende.
+
+\subsection{Monitor-Prozess}
+
+Der \texttt{Monitor}-Prozess empfängt die Mittelwerte und gibt sie direkt auf
+dem Bildschirm aus. Dass die Ausgabe tatsächlich sofort erfolgt wird via
+\texttt{fflush} sichergestellt.
+\np
+
+Dieser Prozess hat ebenfalls per se keine freizugebenden Resourcen.
+
+\clearpage
+\section{Aufgabe 4}
+
+Bei Aufgabe 4 ging es um die Implementation der Prozesskommunikation über
+Shared Memory und Semaphoren. Hierbei haben wir uns für eine einfache
+Warteschlangen-Implementation (Queue) entschieden. Diese benutzt einen
+Ringpuffer mit $255$ Elementen, wobei immer nur das erste Element verarbeitet
+wird. Zum Schreiben in den Ringpuffer muss der Semaphor gesperrt werden, was zu
+jedem Zeitpunkt nur einem Prozess gelingt.
+
+\subsection{Datenstruktur}
+
+Am Anfang des Speichersegments steht ein Header, in welchem der Index des
+aktuellen Elements im Ringpuffer gespeichert wird. Weiterhin befindet sich hier
+der Semaphor zum Sperren der Schreibzugriffe (ein Schreibzugriff ist auch das
+Verarbeiten einer Nachricht, sodass der Ringpuffer-Index auf das nächste
+Element verschoben wird).
+\np
+
+Die Einträge im Ringpuffer wiederum enthalten eine Richtung (\texttt{dir} für
+Direction), welche angibt, von welchem Prozess die Nachricht stammt und an
+welchen sie geht. Weiterhin wird der Datenwert selbst als \texttt{uint8\_t},
+also als 1-Byte-Integer ohne Vorzeichen gespeichert.
+
+\subsection{Initialisierung: queue\_init}
+
+\texttt{queue\_init} erstellt via \texttt{shm\_open} das Shared Memory-Segment, setzt die Größe und bildet es in den Arbeitsspeicher des Programms ab.
+
+\end{document}
