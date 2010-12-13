@@ -99,12 +99,16 @@ struct msg *queue_write(uint8_t dir, uint8_t data) {
     msg.dir = dir;
     msg.data = data;
 
-    uint8_t next;
-    if (shmheader->cur == 255)
-        next = 0;
-    else next = shmheader->cur + 1;
-
     lock();
+    uint8_t next = shmheader->cur;
+    struct msg *nextmsg = shmdata + (shmheader->cur * sizeof(struct msg));
+    while (nextmsg->dir != D_INVALID) {
+        if (next == 255)
+            next = 0;
+        else next++;
+        nextmsg = shmdata + (next * sizeof(struct msg));
+    }
+
     struct msg *curmsg = shmdata + (shmheader->cur * sizeof(struct msg));
     struct msg *nextmsg = shmdata + (next * sizeof(struct msg));
     memcpy(nextmsg, &msg, sizeof(struct msg));
