@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -90,6 +92,31 @@ void queue_init() {
     }
 }
 
+#ifdef DEBUG
+static void vlog(char *fmt, va_list args) {
+    char timebuf[64];
+
+    pid_t p = getpid();
+    /* Get current time */
+    time_t t = time(NULL);
+    /* Convert time to local time (determined by the locale) */
+    struct tm *tmp = localtime(&t);
+    /* Generate time prefix */
+    strftime(timebuf, sizeof(timebuf), "%X - ", tmp);
+    printf("[%d] %s", p, timebuf);
+    vprintf(fmt, args);
+    fflush(stdout);
+}
+
+static void log(char *fmt, ...) {
+    va_list args;
+
+    va_start(args, fmt);
+    vlog(fmt, args);
+    va_end(args);
+}
+#endif
+
 /*
  * Hängt den übergebenen Wert in die Queue.
  *
@@ -110,7 +137,11 @@ struct msg *queue_write(uint8_t dir, uint8_t data) {
     }
 
     struct msg *curmsg = shmdata + (shmheader->cur * sizeof(struct msg));
-    struct msg *nextmsg = shmdata + (next * sizeof(struct msg));
+
+#ifdef DEBUG
+    log("queue_write(), next = %d, nextmsg = %p, cur = %d, cur->dir = %d\n",
+            next, nextmsg, shmheader->cur, curmsg->dir);
+#endif
     memcpy(nextmsg, &msg, sizeof(struct msg));
     if (curmsg->dir == D_INVALID)
         shmheader->cur = next;
@@ -125,6 +156,10 @@ struct msg *queue_write(uint8_t dir, uint8_t data) {
  */
 uint8_t queue_get_dir() {
     struct msg *curmsg = shmdata + (shmheader->cur * sizeof(struct msg));
+#ifdef DEBUG
+    log("queue_get_dir(), cur = %d, cur->dir = %d\n",
+            shmheader->cur, curmsg->dir);
+#endif
     return curmsg->dir;
 }
 
@@ -137,6 +172,11 @@ uint8_t queue_get_data() {
     uint8_t data;
 
     struct msg *curmsg = shmdata + (shmheader->cur * sizeof(struct msg));
+
+#ifdef DEBUG
+    log("queue_get_data(), cur = %d, cur->dir = %d\n",
+            shmheader->cur, curmsg->dir);
+#endif
     data = curmsg->data;
 
     lock();
