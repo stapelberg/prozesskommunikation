@@ -54,6 +54,7 @@ static void unlock() {
  *
  */
 void queue_init() {
+    int c;
     int fd;
     int flags = O_RDWR | O_CREAT | O_TRUNC;
     if ((fd = shm_open("/bts-sem", flags, S_IREAD | S_IWRITE)) == -1) {
@@ -76,7 +77,11 @@ void queue_init() {
 
     /* Speicher mit 0 initialisieren */
     memset(shmheader, 0, sizeof(struct queueheader));
-    shmdata->dir = D_INVALID;
+    struct msg *curmsg = shmdata;
+    for (c = 0; c < 255; c++) {
+        curmsg->dir = D_INVALID;
+        curmsg++;
+    }
 
     /* Semaphor initialisieren */
     if (sem_init(&(shmheader->sem), 1, 1) != 0) {
