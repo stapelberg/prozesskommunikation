@@ -63,33 +63,33 @@ pid_t fork_child(funcptr work, funcptr cleanup) {
     return pid;
 }
 
-mqd_t mqueue_init() {
+mqd_t mqueue_init(const char *queue_name) {
     mqd_t msgqueue_id;
+
+    /* Eventuell existierende unbenutzte Message Queue terminieren,
+     * um Fehlern durch - eventuell bestehende - Datenreste vorzubeugen.
+     */
+    mq_unlink(queue_name);
 
     /*
      * Festlegung der Attribute.
      */
-    struct *mq_attr attributes = calloc(1, sizeof(mq_attr));
-    if (attributes == NULL) {
-        sprintf(stderr, "main.c mq_init: calloc failed\n");
-        return -1;
+    struct mq_attr *attributes = calloc(1, sizeof(struct mq_attr));
+    if (attributes != NULL) { /* NULL als Attribut nimmt die Standard Werte */
+        attributes->mq_flags = 0; /* Queue blockiert bei mq_send()/mq_receive() */
+        attributes->mq_maxmsg = 20; /* maximal 20 Messages in der Queue */
+        attributes->mq_msgsize = 9; /* Maximale Länge einer Nachricht */
+        attributes->mq_curmsgs = 0; /* Anzahl der Messages momentan in der Queue */
     }
-
-    attributes->mq_flags = 0; /* Queue blockiert bei mq_send()/mq_receive() */
-    attributes->mq_maxmsg = 50; /* maximal 50 Messages in der Queue */
-    attributes->mq_msgsize = MAX_QMSG_SIZE; /* Maximale Länge einer Nachricht */
-    attributes->mq_curmsgs = 0; /* Anzahl der Messages momentan in der Queue */
 
     /*
      * Erstellung der Message Queue.
-     * O_CREAT zur Erstellung,
-     * O_EXCL zur Fehlererzeugung, falls es bereits eine Queue mit diesem
-     *  Namen gibt.
-     * 660 Schreib- und Leserechte für Prozessnutzer und -gruppe.
      */
-    msgqueue_id = mq_open(MQ_ID, O_CREAT | O_EXCL, 660, attributes);
-    if (msgqueue_id == -1)
-        sprintf(stderr, "main.c mq_init: mq_open failed\n");
+    msgqueue_id = mq_open(queue_name, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG, attributes);
+    if (msgqueue_id == -1){
+        perror("mq_init");
+        exit(EXIT_FAILURE);
+    }
 
     return msgqueue_id;
 }
@@ -101,12 +101,15 @@ mqd_t mqueue_init() {
  */
 int main() {
 
-    mqd_t mq_id = mqueue_init();
-    if (mq_id == -1)
-        return EXIT_FAILURE;
+    /*
+     * Erstellung der Queues.
+     */
+    mqueue_init(MQ_TO_LOG);
+    mqueue_init(MQ_TO_STATISTIC);
+    mqueue_init(MQ_TO_MONITOR);
 
     pconv = fork_child(conv, conv_cleanup);
-    plog = fork_child(log, log_cleanup);
+    plog = fork_child(logmsg, logmsg_cleanup);
     pstatistic = fork_child(statistic, statistic_cleanup);
     pmonitor = fork_child(monitor, monitor_cleanup);
 

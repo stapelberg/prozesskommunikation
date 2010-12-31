@@ -1,6 +1,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <mqueue.h>
 
