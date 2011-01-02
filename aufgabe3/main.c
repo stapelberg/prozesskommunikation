@@ -63,6 +63,9 @@ pid_t fork_child(funcptr work, funcptr cleanup) {
     return pid;
 }
 
+/*
+ * Message Queue mit dem gegebenen Namen erstellen.
+ */
 mqd_t mqueue_init(const char *queue_name) {
     mqd_t msgqueue_id;
 
@@ -77,7 +80,7 @@ mqd_t mqueue_init(const char *queue_name) {
     struct mq_attr *attributes = calloc(1, sizeof(struct mq_attr));
     if (attributes != NULL) { /* NULL als Attribut nimmt die Standard Werte */
         attributes->mq_flags = 0; /* Queue blockiert bei mq_send()/mq_receive() */
-        attributes->mq_maxmsg = 20; /* maximal 20 Messages in der Queue */
+        attributes->mq_maxmsg = 4; /* maximal 4 Messages in der Queue */
         attributes->mq_msgsize = 9; /* Maximale Länge einer Nachricht */
         attributes->mq_curmsgs = 0; /* Anzahl der Messages momentan in der Queue */
     }
@@ -86,7 +89,7 @@ mqd_t mqueue_init(const char *queue_name) {
      * Erstellung der Message Queue.
      */
     msgqueue_id = mq_open(queue_name, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG, attributes);
-    if (msgqueue_id == -1){
+    if (msgqueue_id == -1) {
         perror("mq_init");
         exit(EXIT_FAILURE);
     }
