@@ -81,12 +81,12 @@ mqd_t mqueue_init(const char *queue_name) {
     if (attributes != NULL) { /* NULL als Attribut nimmt die Standard Werte */
         attributes->mq_flags = 0; /* Queue blockiert bei mq_send()/mq_receive() */
         attributes->mq_maxmsg = 4; /* maximal 4 Messages in der Queue */
-        attributes->mq_msgsize = 9; /* Maximale Länge einer Nachricht */
+        attributes->mq_msgsize = MQ_MSG_SIZE_SEND; /* Maximale Länge einer Nachricht */
         attributes->mq_curmsgs = 0; /* Anzahl der Messages momentan in der Queue */
     }
 
     /*
-     * Erstellung der Message Queue.
+     * Erstellung der Message Queue mit den zuvor definierten Attributen.
      */
     msgqueue_id = mq_open(queue_name, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG, attributes);
     if (msgqueue_id == -1) {
