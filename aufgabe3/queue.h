@@ -14,4 +14,14 @@
 #define MQ_TO_STATISTIC "/mq_bts_pk_statistic"
 #define MQ_TO_MONITOR "/mq_bts_pk_monitor"
 
+/*
+ * Definition der Größe des zum Empfang und Versand
+ * der Nachrichten verwendeten Speichers.
+ * Um garantiert jede Nachricht empfangen zu können,
+ * muss der zum Empfang genutzte Puffer mindestens 1
+ * Byte größer sein, als der zum Versand genutzte.
+ */
+#define MQ_MSG_SIZE_RCV (sizeof(int)*2+1)
+#define MQ_MSG_SIZE_SEND (sizeof(int)*2)
+
 #endif
