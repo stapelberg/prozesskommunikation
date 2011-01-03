@@ -17,7 +17,7 @@ void logmsg() {
 
     /* Message Queue zur Kommunikation mit dem conv Prozess öffnen.
      */
-    if ((log = mq_open(MQ_TO_LOG, O_RDWR)) == -1) {
+    if ((log = mq_open(MQ_TO_LOG, O_RDONLY)) == -1) {
         perror("logmsg() mq_open");
         exit(EXIT_FAILURE);
     }
@@ -31,7 +31,7 @@ void logmsg() {
     /*
      * Speicher für Nachricht allokieren.
      */
-    if ((message = calloc(1, MQ_MSG_SIZE_SEND)) == NULL) {
+    if ((message = calloc(1, MQ_MSG_SIZE_RCV)) == NULL) {
         perror("logmsg()");
         exit(EXIT_FAILURE);
     }
