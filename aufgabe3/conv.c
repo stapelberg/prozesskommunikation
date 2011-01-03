@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <limits.h>
 
 #include "queue.h"
 
@@ -37,7 +38,11 @@ void conv() {
     }
 
     for (;;) {
-        random_number = rand();
+        /* Generierung der Zufallszahl, um Fehler im
+         * statistic Prozess zu vermeiden mit geringerem
+         * Wertebereich [0, SHRT_MAX] (quasi als short).
+         */
+        random_number = rand()%SHRT_MAX;
 
         /* Zufallszahl ins Hexadezimalformat konvertieren. */
         sprintf(message, "%x", random_number);
@@ -46,7 +51,7 @@ void conv() {
          * in die Queue zum statistic Prozess schreiben.
          */
         if ((mq_send(log, message, MQ_MSG_SIZE_SEND, 0) == -1) ||
-            mq_send(statistic, message, MQ_MSG_SIZE_SEND, 0) == -1){
+            mq_send(statistic, message, MQ_MSG_SIZE_SEND, 0) == -1) {
             perror("conv() mq_send");
             exit(EXIT_FAILURE);
         }
