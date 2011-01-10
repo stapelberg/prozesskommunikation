@@ -1,6 +1,6 @@
 /*
  * vim:ts=4:sw=4:expandtab
- * 
+ *
  */
 #include <stdio.h>
 #include <unistd.h>
@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "queue.h"
 #include "conv.h"
 #include "log.h"
 #include "monitor.h"
@@ -50,7 +51,7 @@ pid_t fork_child(funcptr work, funcptr cleanup) {
          * die Prozessfunktion doch zurückkehrt. */
         exit(EXIT_FAILURE);
     }
-    
+
     if (pid == -1) {
         /* error */
         perror("fork()");
@@ -69,6 +70,17 @@ pid_t fork_child(funcptr work, funcptr cleanup) {
  *
  */
 int main() {
+
+    /*
+     * Öffnen der Pipes.
+     */
+    if ((pipe(queue[D_CONV_TO_LOG])!=0) || (pipe(queue[D_CONV_TO_STAT])!=0) ||
+        (pipe(queue[D_STAT_TO_MON])!=0)) {
+        perror("main.c pipe()");
+        exit(EXIT_FAILURE);
+    }
+
+
     pconv = fork_child(conv, conv_cleanup);
     plog = fork_child(log, log_cleanup);
     pstatistic = fork_child(statistic, statistic_cleanup);
@@ -84,3 +96,4 @@ int main() {
 
     return 0;
 }
+
