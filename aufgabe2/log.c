@@ -13,7 +13,6 @@ FILE *logfile;
 char *message;
 
 void log() {
-    int buffer;
     printf("log started\n");
 
     /* Die Pipe zum lesen öffnen */
@@ -36,7 +35,8 @@ void log() {
 
     /* Nachricht aus der Pipe lesen, als Endian abhängiger
      * HEX-Wert in die Log Datei schreiben. Für portable
-     * Rückkonvertierung ins Dezimalsystem siehe Aufgabe 3.
+     * Rückkonvertierung ins Dezimalsystem siehe Aufgabe 3,
+     * oder bei Aufgabe 2 in statistic.c und monitor.c
      */
     while (fgets(message, SIZE_HEX+1, pipe_conv)) {
         fputs(message, logfile);

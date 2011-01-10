@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <limits.h>
 
 #include "queue.h"
 
@@ -15,6 +14,8 @@ FILE *pipe_stat;
 void conv() {
     int random_number = 0;
 
+    printf("conv started\n");
+
     /* Die beiden Pipes zum schreiben öffnen */
     if (((pipe_log = fdopen(queue[D_CONV_TO_LOG][WRITE], "w")) == NULL) ||
         ((pipe_stat = fdopen(queue[D_CONV_TO_STAT][WRITE], "w")) == NULL)) {
@@ -23,11 +24,8 @@ void conv() {
     }
 
     for (;;) {
-        /* Generierung der Zufallszahl, um Fehler im
-         * statistic Prozess zu vermeiden mit geringerem
-         * Wertebereich [0, SHRT_MAX] (quasi als short).
-         */
-        random_number = rand()%SHRT_MAX;
+        /* Generierung der Zufallszahl */
+        random_number = rand();
 
         /* Nachricht sowohl in die Queue zum log Prozess als auch
          * in die Queue zum statistic Prozess schreiben.
