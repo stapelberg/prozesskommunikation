@@ -13,6 +13,14 @@ FILE *logfile;
 char *message;
 
 void log() {
+    /* ungenutzte Pipeköpfe schließen */
+    close(queue[D_CONV_TO_LOG][WRITE]);
+    close(queue[D_CONV_TO_STAT][READ]);
+    close(queue[D_CONV_TO_STAT][WRITE]);
+    close(queue[D_STAT_TO_MON][READ]);
+    close(queue[D_STAT_TO_MON][WRITE]);
+
+
     printf("log started\n");
 
     /* Die Pipe zum lesen öffnen */

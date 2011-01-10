@@ -15,6 +15,13 @@ char *message;
 void statistic() {
     int current_value = 0, last_value = 0, result;
 
+    /* ungenutzte Pipeköpfe schließen */
+    close(queue[D_CONV_TO_LOG][READ]);
+    close(queue[D_CONV_TO_LOG][WRITE]);
+    close(queue[D_CONV_TO_STAT][WRITE]);
+    close(queue[D_STAT_TO_MON][READ]);
+
+
     printf("statistic started\n");
 
     /* Die Pipe zum conv Prozess lesend öffnen, die zum monitor schreibend */

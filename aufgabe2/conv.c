@@ -14,6 +14,12 @@ FILE *pipe_stat;
 void conv() {
     int random_number = 0;
 
+    /* ungenutzte Pipeköpfe schließen */
+    close(queue[D_CONV_TO_LOG][READ]);
+    close(queue[D_CONV_TO_STAT][READ]);
+    close(queue[D_STAT_TO_MON][READ]);
+    close(queue[D_STAT_TO_MON][WRITE]);
+
     printf("conv started\n");
 
     /* Die beiden Pipes zum schreiben öffnen */
