@@ -5,7 +5,6 @@
 #include <semaphore.h>
 
 struct queueheader {
-	uint8_t msgs;
 	uint8_t cur;
 	sem_t sem;
 };
