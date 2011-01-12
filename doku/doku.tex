@@ -115,8 +115,53 @@ Direction), welche angibt, von welchem Prozess die Nachricht stammt und an
 welchen sie geht. Weiterhin wird der Datenwert selbst als \texttt{uint8\_t},
 also als 1-Byte-Integer ohne Vorzeichen gespeichert.
 
+\begin{figure}[h!]
+\centering
+\caption{Illustration Datenstruktur}
+\includegraphics[width=0.75\textwidth]{a4-crop}
+\end{figure}
+
 \subsection{Initialisierung: queue\_init}
 
-\texttt{queue\_init} erstellt via \texttt{shm\_open} das Shared Memory-Segment, setzt die Größe und bildet es in den Arbeitsspeicher des Programms ab.
+\texttt{queue\_init} erstellt via \texttt{shm\_open} das Shared Memory-Segment,
+setzt die Größe und bildet es in den Arbeitsspeicher des Programms ab.
+Weiterhin wird der Speicherbereich mit Nullen initialisiert und der Semaphor
+initialisiert. Da bei einem \texttt{fork} der Arbeitsspeicher nicht verändert
+wird, ist die Abbildung des Shared Memory-Segments auch in den Kindprozessen
+ohne weitere Initialisierung direkt nutzbar.
+
+\subsection{Schreiben eines neuen Eintrags: queue\_write}
+
+In der Funktion \texttt{queue\_write} wird zunächst via Semaphor die
+Datenstruktur gesperrt. Das ist nötig, damit anschließend deterministisch die
+Stelle bestimmt werden kann, an welcher das nächste Element eingefügt wird.
+Diese wird dadurch gefunden, dass frisch initialisierte und bereits bearbeitete
+Einträge den Wert \texttt{D\_INVALID} als \texttt{dir} (Direction) haben.
+
+Nun wird das Element via \texttt{memcpy} kopiert, der \texttt{cur}-Wert im
+Header (für das aktuelle Element) angepasst und der Semaphor wieder entsperrt.
+
+\subsection{Richtung des aktuellen Eintrags abrufen}
+
+Die Richtung des aktuellen Eintrags kann man sehr einfach herausfinden, indem
+das aktuelle Element ermittelt wird und anschließend der \texttt{dir}-Wert
+zurückgegeben wird.
+
+Diese Funktion arbeitet ohne Locks oder zusätzliche Variablen auf dem Stack. Da
+sie in einer Schleife permanent aufgerufen wird, solange die einzelnen Prozesse
+warten, ist das eine gute Eigenschaft.
+
+\subsection{Daten abrufen und Element invalidieren: queue\_get\_data}
+
+Da durch die Richtung (\texttt{dir}) immer klar ist, von welchem Prozess die
+Nachricht kommt und an welchen sie gerichtet ist, ruft kein Prozess
+\texttt{queue\_get\_data} auf, der mit den Daten nichts anfangen kann. Deshalb
+haben wir uns entschieden, die Funktion atomar den Datenwert der aktuellen
+Nachricht zurückgeben zu lassen und diesen gleichzeitig zu invalidieren.
+
+Die Invalidierung geschieht, indem der \texttt{dir}-Wert auf
+\texttt{D\_INVALID} gesetzt und der \texttt{cur}-Wert im Header auf das nächste
+Element verschoben wird.
+
 
 \end{document}
