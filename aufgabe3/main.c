@@ -112,7 +112,7 @@ int main() {
     mqueue_init(MQ_TO_MONITOR);
 
     pconv = fork_child(conv, conv_cleanup);
-    plog = fork_child(logmsg, logmsg_cleanup);
+    plog = fork_child(log, log_cleanup);
     pstatistic = fork_child(statistic, statistic_cleanup);
     pmonitor = fork_child(monitor, monitor_cleanup);
 

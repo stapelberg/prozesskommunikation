@@ -11,20 +11,20 @@
 FILE *logfile;
 char *message;
 
-void logmsg() {
+void log() {
     int random_number = 0;
     mqd_t log;
 
     /* Message Queue zur Kommunikation mit dem conv Prozess öffnen.
      */
     if ((log = mq_open(MQ_TO_LOG, O_RDONLY)) == -1) {
-        perror("logmsg() mq_open");
+        perror("log() mq_open");
         exit(EXIT_FAILURE);
     }
 
     /* Logdatei öffnen */
-    if ((logfile = fopen("logfile.txt", "w")) == NULL) {
-        perror("logmsg() fopen");
+    if ((logfile = fopen("log.txt", "w")) == NULL) {
+        perror("log() fopen");
         exit(EXIT_FAILURE);
     }
 
@@ -32,7 +32,7 @@ void logmsg() {
      * Speicher für Nachricht allokieren.
      */
     if ((message = calloc(1, MQ_MSG_SIZE_RCV)) == NULL) {
-        perror("logmsg()");
+        perror("log()");
         exit(EXIT_FAILURE);
     }
 
@@ -40,7 +40,7 @@ void logmsg() {
 
         /* Nachricht über log Queue empfangen */
         if (mq_receive(log, message, MQ_MSG_SIZE_RCV, NULL) == -1) {
-            perror("logmsg() mq_receive");
+            perror("log() mq_receive");
             exit(EXIT_FAILURE);
         }
 
@@ -53,7 +53,7 @@ void logmsg() {
     }
 }
 
-void logmsg_cleanup() {
+void log_cleanup() {
     printf("log cleanup\n");
     free(message);
     mq_unlink(MQ_TO_LOG);

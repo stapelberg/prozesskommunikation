@@ -30,7 +30,7 @@ void log() {
     }
 
     /* Logdatei öffnen */
-    if ((logfile = fopen("logfile.txt", "w")) == NULL) {
+    if ((logfile = fopen("log.txt", "w")) == NULL) {
         perror("log.c fopen()");
         exit(EXIT_FAILURE);
     }

@@ -1,7 +1,7 @@
 #ifndef _LOG_H
 #define _LOG_H
 
-void logmsg();
-void logmsg_cleanup();
+void log();
+void log_cleanup();
 
 #endif
