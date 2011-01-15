@@ -93,6 +93,66 @@ dem Bildschirm aus. Dass die Ausgabe tatsächlich sofort erfolgt wird via
 Dieser Prozess hat ebenfalls per se keine freizugebenden Resourcen.
 
 \clearpage
+\section{Aufgabe 2}
+
+Aufgabe 2 verlangte die Prozesskommunikation mittels Pipes zu implementieren.
+Die \texttt{pipe} Funktion erstellt eine Datei und liefert zwei Deskriptoren,
+einen zum Schreiben und einen zum Lesen. Der Umgang mit dieser Datei geschieht
+mit den selben Funktionen wie sie auch zum Lesen von Dateien im Dateisystem
+genutzt werden.
+
+\subsection{Kommunikationsstruktur}
+
+Nach Start des Programmes werden drei Pipes erstellt, jeweils eine zur direkten
+Kommunikation zwischen zwei Prozessen. Aus Gründen der Bequemlichkeit entschlossen 
+wir uns die erstellten Deskriptoren in einem globalen Array zu erstellen und den
+Zugriff beim Programmieren mit einem enum und zwei defines zu vereinfachen. Die
+vom Prozess nicht benötigten Pipes werden direkt nach Start des selbigen geschlossen.\\
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+	\textbf{Schreibend} & \textbf{Lesend} \\
+\hline
+	\texttt{conv} & \texttt{log} \\
+\hline
+	\texttt{conv} & \texttt{statistic} \\
+\hline
+	\texttt{statistic} & \texttt{monitor}\\
+\hline
+\end{tabular}\\
+\textit{Die verwendeten Pipes}
+\end{center}
+
+\subsection{Datenaustausch}
+Da der Datenaustausch über eine vom Kernel verwaltete virtuelle Datei erfolgt,
+haben wir uns hier - wie auch bei der Implementierung der Aufgabe 3 - der
+Einfachheit halber den Austausch der Zahlen über die Formatierung als Hexwerte
+entschieden, auch der \texttt{log} Prozess dieser Implementierung schreibt die
+Werte in ihrer Hexadezimalen Darstellung in die \texttt{log.txt}, was jedoch die
+Portabilität der Logdatei auf andere Systeme erschwert(Little-/Big-Endian).
+
+\clearpage
+\section{Aufgabe 3}
+
+Bei dieser Aufgabe wurde die Kommunikation über Message Queues zu implementieren,
+POSIX-konforme Implementierungen der grundlegenden Funktionen hierfür haben die
+angenehme Eigenschaft standardmäßig mit Locks zu arbeiten. Dies liese zwar mittels 
+der \texttt{O\_NONBLOCK} Option deaktivieren, wäre in unserem Fall jedoch 
+kontraproduktiv.
+
+\subsection{Kommunikationsstruktur}
+Ähnlich wie bei Aufgabe 2 verwenden wir hier erneut 3 Kanäle zur Kommunikation
+zwischen den Prozessen, die Queues werden nach dem Programmstart initialisiert
+und beim Start der Prozesse geöffnet. Eine Verwendung einer einzelnen Queue ist
+selbstverständlich möglich, wir haben uns dennoch dazu entschlossen schlicht das
+Modell der Pipes auf das der Queues abzubilden, am Aufbau hat sich also im Vergleich
+zu Aufgabe 2 nur wenig geändert.
+
+\subsection{Datenaustausch}
+Auch hier haben wir wenig geändert, die Zahlenwerte werden weiterhin in Hexadezimaler Form an die anderen Prozesse gesendet, der \texttt{log} Prozess schreibt die Zahlen diesmal jedoch in dezimaler Form in die Logdatei.
+
+\clearpage
 \section{Aufgabe 4}
 
 Bei Aufgabe 4 ging es um die Implementation der Prozesskommunikation über
