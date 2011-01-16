@@ -148,6 +148,12 @@ und beim Start der Prozesse geöffnet. Eine Verwendung einer einzelnen Queue ist
 selbstverständlich möglich, wir haben uns dennoch dazu entschlossen schlicht das
 Modell der Pipes auf das der Queues abzubilden, am Aufbau hat sich also im Vergleich
 zu Aufgabe 2 nur wenig geändert.
+\np
+
+Die Verwendung einer einzelnen Queue wäre über die \texttt{SystemV} API von geringem 
+Aufwand, da diese den spezifischen Zugriff auf Nachrichten mit einer bestimmten 
+Priorität erlaubt, die \texttt{POSIX} Funktion \texttt{mq\_receive} dies jedoch nicht 
+ermöglicht und so ein umfangreicheres Nachrichtensystem entwickelt werden müsste.
 
 \subsection{Datenaustausch}
 Auch hier haben wir wenig geändert, die Zahlenwerte werden weiterhin in Hexadezimaler Form an die anderen Prozesse gesendet, der \texttt{log} Prozess schreibt die Zahlen diesmal jedoch in dezimaler Form in die Logdatei.
