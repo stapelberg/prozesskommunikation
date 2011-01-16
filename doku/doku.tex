@@ -96,7 +96,7 @@ Dieser Prozess hat ebenfalls per se keine freizugebenden Resourcen.
 \section{Aufgabe 2}
 
 Aufgabe 2 verlangte die Prozesskommunikation mittels Pipes zu implementieren.
-Die \texttt{pipe} Funktion erstellt eine Datei und liefert zwei Deskriptoren,
+Die \texttt{pipe} Funktion erstellt eine Pipe und liefert zwei Deskriptoren,
 einen zum Schreiben und einen zum Lesen. Der Umgang mit dieser Datei geschieht
 mit den selben Funktionen wie sie auch zum Lesen von Dateien im Dateisystem
 genutzt werden.
@@ -135,11 +135,11 @@ Portabilität der Logdatei auf andere Systeme erschwert(Little-/Big-Endian).
 \clearpage
 \section{Aufgabe 3}
 
-Bei dieser Aufgabe wurde die Kommunikation über Message Queues zu implementieren,
+Bei dieser Aufgabe galt es, die Kommunikation über Message Queues zu implementieren.
 POSIX-konforme Implementierungen der grundlegenden Funktionen hierfür haben die
-angenehme Eigenschaft standardmäßig mit Locks zu arbeiten. Dies liese zwar mittels 
-der \texttt{O\_NONBLOCK} Option deaktivieren, wäre in unserem Fall jedoch 
-kontraproduktiv.
+angenehme Eigenschaft standardmäßig mit Locks zu arbeiten. Dies liese sich zwar
+mittels der \texttt{O\_NONBLOCK} Option deaktivieren, wäre in unserem Fall
+jedoch kontraproduktiv.
 
 \subsection{Kommunikationsstruktur}
 Ähnlich wie bei Aufgabe 2 verwenden wir hier erneut 3 Kanäle zur Kommunikation
@@ -164,7 +164,7 @@ Auch hier haben wir wenig geändert, die Zahlenwerte werden weiterhin in Hexadez
 Bei Aufgabe 4 ging es um die Implementation der Prozesskommunikation über
 Shared Memory und Semaphoren. Hierbei haben wir uns für eine einfache
 Warteschlangen-Implementation (Queue) entschieden. Diese benutzt einen
-Ringpuffer mit $255$ Elementen, wobei immer nur das erste Element verarbeitet
+Ringpuffer mit $255$ Elementen, wobei immer nur ein Element verarbeitet
 wird. Zum Schreiben in den Ringpuffer muss der Semaphor gesperrt werden, was zu
 jedem Zeitpunkt nur einem Prozess gelingt.
 
