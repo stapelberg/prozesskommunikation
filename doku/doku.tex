@@ -150,13 +150,19 @@ Modell der Pipes auf das der Queues abzubilden, am Aufbau hat sich also im Vergl
 zu Aufgabe 2 nur wenig geändert.
 \np
 
-Die Verwendung einer einzelnen Queue wäre über die \texttt{SystemV} API von geringem 
-Aufwand, da diese den spezifischen Zugriff auf Nachrichten mit einer bestimmten 
-Priorität erlaubt, die \texttt{POSIX} Funktion \texttt{mq\_receive} dies jedoch nicht 
-ermöglicht und so ein umfangreicheres Nachrichtensystem entwickelt werden müsste.
+Die Verwendung einer einzelnen Queue wäre über die \texttt{SystemV} API von 
+geringerem Aufwand, da diese den direkten Zugriff auf Nachrichten mit einer
+spezifischen Priorität erlaubt. Da die \texttt{POSIX} Funktion
+\texttt{mq\_receive} dies jedoch nicht direkt ermöglicht, wäre für die Nutzung
+einer einzelnen Queue die Entwicklung eines umfangreicheres Nachrichtensystems
+nötig gewesen, welches den Zugriff auf die Queue mit weiteren Wrapperfunktionen
+abstrahiert, zentral die Nachrichten verwaltet und dem aufrufendem Prozess die
+älteste Nachricht des gefragten Typs überreicht.
 
 \subsection{Datenaustausch}
-Auch hier haben wir wenig geändert, die Zahlenwerte werden weiterhin in Hexadezimaler Form an die anderen Prozesse gesendet, der \texttt{log} Prozess schreibt die Zahlen diesmal jedoch in dezimaler Form in die Logdatei.
+Auch hier haben wir wenig geändert, die Zahlenwerte werden weiterhin in 
+Hexadezimaler Form an die anderen Prozesse gesendet, der \texttt{log} 
+Prozess schreibt die Zahlen diesmal jedoch in dezimaler Form in die Logdatei.
 
 \clearpage
 \section{Aufgabe 4}
