@@ -155,9 +155,10 @@ geringerem Aufwand, da diese den direkten Zugriff auf Nachrichten mit einer
 spezifischen Priorität erlaubt. Da die \texttt{POSIX} Funktion
 \texttt{mq\_receive} dies jedoch nicht direkt ermöglicht, wäre für die Nutzung
 einer einzelnen Queue die Entwicklung eines umfangreicheres Nachrichtensystems
-nötig gewesen, welches den Zugriff auf die Queue mit weiteren Wrapperfunktionen
-abstrahiert, zentral die Nachrichten verwaltet und dem aufrufendem Prozess die
-älteste Nachricht des gefragten Typs überreicht.
+nötig gewesen. Dieses hätte den Zugriff auf die Queue mit weiteren
+Wrapperfunktionen abstrahiert, die Nachrichten zentral verwaltet und dem
+aufrufendem Prozess die älteste Nachricht oder die Nachricht mit der höchsten
+Priorität des vom Prozess angefragten Typs überreicht.
 
 \subsection{Datenaustausch}
 Auch hier haben wir wenig geändert, die Zahlenwerte werden weiterhin in 
